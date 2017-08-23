@@ -29,29 +29,27 @@ Finding the most in-demand jobs around the world right now to see which countrie
 
 
 To answer this question, we could follow this manual process:
+
   1. Visit the [Western Union] website and go to a blog article "[The Most In-Demand Careers Around the World]". 
   2. Underneath the main title, within sub-headings, we would see a list of jobs in-demand and the countries which are in short of them:
     a. Identify the jobs list (e.g. Teachers, Accountants) headings and countries in demand.
     b. Populate it into a vector.
     c. Add the identified location information to our list of results
- 
-
-  1. Visit the [Seek] web site and enter a search query for "data science".
-  2. On the [query results] page, we'd see a list of "featured" jobs and "normal" vacancies. For each "normal" job, we could then:
-    a. Follow the link provided by the vacancy advertisement to get the job information page
-    b. Identify the relevant "Location" information on the page
-    c. Add the identified location information to our list of results
-  3. Once we've visited all the relevant vacancy ads, we have a list of locations that we could tabulate - job done!
+    
   
 ## Required Components
 
-The [Seek] site has a search query interface that allows us to search for jobs via keywords:
 
-![The Seek website (compact interface shown) with "data science" keywords ready to be searched](images/seek.png)
+On the "[The Most In-Demand Careers Around the World]" article, the page contains a list of jobs:
 
-The way that Seek returns its search results is through a page with well-defined query parameters: https://www.seek.co.nz/jobs?keywords=%22data+science%22, which leads to the following page:
+![Identify the job titles based on the headings](images/westernunion.png)
 
-![The Seek search results page for "data science" jobs (compact interface shown)](images/searchresults.png)
+We know that the required URL to get the components from is https://www.westernunion.com/blog/jobs-in-demand/, and as we scroll down, we are able to identify the job titles headings, like below:
+
+![Choose the headings that we are wanting to get information / scrape)](images/wu-countries.png)
+
+In the next section, we are going to scrape the job titles for the Western Union blog article. To do so, we must know how the page structures its documents and what hints can we extract from it to make it easier to identify the pages that we need. Also, we want to extract the 'Countries in Demand' section, so we also have to find the correct CSS selectors.
+
 
 The search results are prefixed with "promoted" jobs (which are repeated later under the "normal" job section) that we need to eliminate from our scraping. Fortunately, the normal job results can be easily filtered (in this case, using XPath). Then within each job advertisement, we want to extract the title element of the job (as this contains the link to the job description), so that we can then jump to this page and extract the details that we need:
 
@@ -77,6 +75,16 @@ With a bit of tweaking, we can make this selector somewhat less awkward:
 With the XPath/CSS selectors identified, and a general workflow in place, we can now proceed with the scraping.
 
 # Scraping Procedure
+```{r ex2 initial setup, echo=TRUE}
+blog.url <- "https://www.westernunion.com/blog/jobs-in-demand/"
+doc.url <- read_html(blog.url)
+
+list.jobtitles <- html_nodes(doc.url, "#main > div.row.row-flex.post-single > div > div > div.row.post-data > div > div.post-content > h2")
+html_text(list.jobtitles)
+```
+
+
+
 We start with defining a few key components (the required libraries, starting url, and key XPath/CSS selectors):
 ```{r scraping setup, echo=TRUE}
 library(rvest)
