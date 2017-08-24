@@ -16,12 +16,12 @@ knitr::opts_chunk$set(echo = TRUE)
 - Bhavisha Solanki
 - Ruth Banda
 
-This assignment template should be considered a rough guide as an acceptable type of project for your first INFO 204 assignment. You can deviate from the actual process (e.g., scrape pages from two different web sites), but the main points to focus on are that:
+<!-- This assignment template should be considered a rough guide as an acceptable type of project for your first INFO 204 assignment. You can deviate from the actual process (e.g., scrape pages from two different web sites), but the main points to focus on are that: -->
 
-  1. you provide a clear description of your problem that can be followed without any specific code; and
-  2. your code matches the description of your workflow.
-  
-Your "analysis" following the data scraping does not need to be comprehensive (see below for how simple it may be). However, if you perform a more substantial analysis of your results, then this will be taken into account should you have missed anything earlier in your assignment and marks that you may have lost in earlier sections may be recovered.
+<!--   1. you provide a clear description of your problem that can be followed without any specific code; and -->
+<!--   2. your code matches the description of your workflow. -->
+
+<!-- Your "analysis" following the data scraping does not need to be comprehensive (see below for how simple it may be). However, if you perform a more substantial analysis of your results, then this will be taken into account should you have missed anything earlier in your assignment and marks that you may have lost in earlier sections may be recovered. -->
 
 # Problem Definition
 
@@ -53,6 +53,15 @@ In the next section, we are going to scrape the job titles for the Western Union
 As we try to find the CSS selector for the 'Countries in Demand' section, we have to figure out how to exclude the paragraphs in CSS sections so that we scrape for Countries in Demand element, it would not get all of the irrelevant paragraphs (p) selectors.
 
 ![The parts of the countries in demand that we need to scrape (compact interface shown)](images/dont-want-section.png)
+
+
+![This is how we get data using the Chrome Developer Tools](images/chrome-dev-tools.png)
+
+
+![This is how we get data using the Chrome Developer Tools](images/chrome-dev-tools2.png)
+
+
+
 
 <!-- So, once we are on the search results page, we can use the developer tools to explore the source behind the page, and from this, we can see that we need the article elements that have a data-automation attribute setting of 'normalJob': -->
 <!-- ![The parts of the job details that we need to scrape (compact interface shown)](images/xpath-selector-job.png) -->
