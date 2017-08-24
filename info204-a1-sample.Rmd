@@ -54,24 +54,24 @@ As we try to find the CSS selector for the 'Countries in Demand' section, we hav
 
 ![The parts of the countries in demand that we need to scrape (compact interface shown)](images/dont-want-section.png)
 
-So, once we are on the search results page, we can use the developer tools to explore the source behind the page, and from this, we can see that we need the article elements that have a data-automation attribute setting of 'normalJob':
-![The parts of the job details that we need to scrape (compact interface shown)](images/xpath-selector-job.png)
-Therefore, we can scrape the required job information with the XPath selector:
-`"//article[@data-automation='normalJob']"`
-Note that we haven't really talked about XPath in INFO 204 - it is an alternative to using CSS selectors that provide more fined-grained control over the access (but the syntax can sometimes be a little bit confusing, so use it only when absolutely necessary!). More details on XPath can be found [at this tutorial](https://www.w3schools.com/xml/xml_xpath.asp).
+<!-- So, once we are on the search results page, we can use the developer tools to explore the source behind the page, and from this, we can see that we need the article elements that have a data-automation attribute setting of 'normalJob': -->
+<!-- ![The parts of the job details that we need to scrape (compact interface shown)](images/xpath-selector-job.png) -->
+<!-- Therefore, we can scrape the required job information with the XPath selector: -->
+<!-- `"//article[@data-automation='normalJob']"` -->
+<!-- Note that we haven't really talked about XPath in INFO 204 - it is an alternative to using CSS selectors that provide more fined-grained control over the access (but the syntax can sometimes be a little bit confusing, so use it only when absolutely necessary!). More details on XPath can be found [at this tutorial](https://www.w3schools.com/xml/xml_xpath.asp). -->
 
-Similarly, we can use the developer tools to identify what part of these article elements contains the title and hyperlink. A little bit of drilling tells us that the title is an h1 (heading type 1) element, and there in an a (anchor) element under this with the link that we need. Therefore, once we have each of the article elements pertaining to the jobs, we can access the anchor element using the CSS selector:
-`"h1 a"`, and then access the href attribute from this element to get to the next page.
+<!-- Similarly, we can use the developer tools to identify what part of these article elements contains the title and hyperlink. A little bit of drilling tells us that the title is an h1 (heading type 1) element, and there in an a (anchor) element under this with the link that we need. Therefore, once we have each of the article elements pertaining to the jobs, we can access the anchor element using the CSS selector: -->
+<!-- `"h1 a"`, and then access the href attribute from this element to get to the next page. -->
 
-The next page has a fairly simple structure that should be easily scraped:
+<!-- The next page has a fairly simple structure that should be easily scraped: -->
 
-![The parts of the dearch results that we need to scrape (compact interface shown)](images/dev-tools-jobdetails.png)
-Once the required element is identified, we can use the developer tools in Chrome to copy the required CSS selector, which is the awkward:
-`"#app > div > div > div:nth-child(3) > div > div > div:nth-child(3) > div > div.PxPTnGA > div > article > div > div:nth-child(1) > span > div > section > dl > dd:nth-child(4) > span > span > strong"`.
-With a bit of tweaking, we can make this selector somewhat less awkward:
-`"dl > dd:nth-child(4) > span > span > strong"`.
+<!-- ![The parts of the dearch results that we need to scrape (compact interface shown)](images/dev-tools-jobdetails.png) -->
+<!-- Once the required element is identified, we can use the developer tools in Chrome to copy the required CSS selector, which is the awkward: -->
+<!-- `"#app > div > div > div:nth-child(3) > div > div > div:nth-child(3) > div > div.PxPTnGA > div > article > div > div:nth-child(1) > span > div > section > dl > dd:nth-child(4) > span > span > strong"`. -->
+<!-- With a bit of tweaking, we can make this selector somewhat less awkward: -->
+<!-- `"dl > dd:nth-child(4) > span > span > strong"`. -->
 
-With the XPath/CSS selectors identified, and a general workflow in place, we can now proceed with the scraping.
+<!-- With the XPath/CSS selectors identified, and a general workflow in place, we can now proceed with the scraping. -->
 
 # Scraping Procedure
 We start with defining a few key components (the required libraries, starting url, and key XPath/CSS selectors):
@@ -83,16 +83,30 @@ blog.url <- "https://www.westernunion.com/blog/jobs-in-demand/"
 doc.url <- read_html(blog.url)
 
 list.jobtitles <- html_nodes(doc.url, "#main > div.row.row-flex.post-single > div > div > div.row.post-data > div > div.post-content > h2")
-html_text(list.jobtitles)
+raw.data <- html_text(list.jobtitles)
+clean.jobtitles.data <- gsub("[\n]", "", raw.data)
+clean.jobtitles.data
 ```
 
+However for the second part, we have to exclude other paragraphs. 
 ```{r get countries in demand, echo=TRUE}
-blog.url <- "https://www.westernunion.com/blog/jobs-in-demand/"
-doc.url <- read_html(blog.url)
-
-list.countries <- html_nodes(doc.url, "#main > div.row.row-flex.post-single > div > div > div.row.post-data > div > div.post-content > p")
-html_text(list.countries)
+countries.selector <- "//*[@id='main']/div[2]/div/div/div[2]/div/div[3]/p[5]"
+list.paragraphs <- html_nodes(doc.url, xpath=countries.selector)
+raw.paragraphs.data <- html_text(list.paragraphs)
+raw.paragraphs.data
 ```
+
+
+
+However for the second part, we have to exclude other paragraphs. We have to perform the iteration over the href attributes that we discovered, extract the relevant page elements, and add them into a results list (steps 2 a, b, and c in our previously defined workflow). :
+```{r get countries in a for loop, echo=TRUE}
+countries.selector <- "//*[@id='main']/div[2]/div/div/div[2]/div/div[3]/p[9]"
+list.paragraphs <- html_nodes(doc.url, xpath=countries.selector)
+raw.paragraphs.data <- html_text(list.paragraphs)
+raw.paragraphs.data
+
+```
+
 
 We start with defining a few key components (the required libraries, starting url, and key XPath/CSS selectors):
 ```{r scraping setup, echo=TRUE}
@@ -121,7 +135,7 @@ job.links <- html_nodes(jobs, title.selector)
 job.href <- html_attr(job.links, "href")
 ```
 
-Now, we perform the iteration over the href attributes that we discovered, extract the relevant page elements, and add them into a results list (steps 2 a, b, and c in our previously defined workflow):
+Now, we perform the iteration over the href attributes that we discovered, extract the relevant page elements, and add them into a results list (steps 2 a, b, and c in our previously defined workflow).
 ```{r scraper iteration, echo=TRUE}
 location.selector <- "dl > dd:nth-child(4) > span > span > strong"
 job.locations <- NULL ## a container for our results, starts off empty
