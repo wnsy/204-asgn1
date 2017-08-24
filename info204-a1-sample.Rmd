@@ -44,7 +44,7 @@ On the "[The Most In-Demand Careers Around the World]" article, the page contain
 
 ![Identify the job titles based on the headings](images/westernunion.png)
 
-We know that the required URL to get the components from is https://www.westernunion.com/blog/jobs-in-demand/, and as we scroll down, we are able to identify the job titles headings, like below:
+We know that the required URL to get the components from is https://www.westernunion.com/blog/jobs-in-demand/, and as we scroll down, we are able to identify the job titles headings and sub headings, like below:
 
 ![Choose the headings that we are wanting to get information / scrape)](images/wu-countries.png)
 
@@ -53,6 +53,23 @@ In the next section, we are going to scrape the job titles for the Western Union
 As we try to find the CSS selector for the 'Countries in Demand' section, we have to figure out how to exclude the paragraphs in CSS sections so that we scrape for Countries in Demand element, it would not get all of the irrelevant paragraphs (p) selectors.
 
 ![The parts of the countries in demand that we need to scrape (compact interface shown)](images/dont-want-section.png)
+We want to take the countries which are repeated under the different job categories as this will show us what skills each country lacks and if they lack multiple skills then we have more data to back it up and is more reliable to claim that so and so country requires [job1] and [job2] and see if there are specific trends between countries in terms of the jobs in demand. 
+
+Image for first website
+
+We are using Chrome Developer tools to get the XPath of the countries in demand section in the website to get raw data to plot the jobs in demand against. This data will aid us in plotting our graphs and to find trends within countries (y-axis: jobs in demand, x-axis: list of countries). 
+
+
+1. Visit the [CNBC] website and go to a blog article "[The 9 most-in-demand jobs of 2017]". 
+  2. Underneath the main title, within sub-headings, we would see a list of jobs in-demand, their current salary and the projected hiring growth of that job by 2024:
+    a. Identify the 9 jobs in demand (e.g. Registered Nurse, Data Scientist) and projected hiring growth by 2024.
+    b. Populate it into a table.
+    c. Add the identified location information to our list of results
+    
+
+img second website
+
+This is the website showing the 
 
 
 ![This is how we get data using the Chrome Developer Tools](images/chrome-dev-tools.png)
