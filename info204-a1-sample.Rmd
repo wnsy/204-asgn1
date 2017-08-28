@@ -56,7 +56,6 @@ XPath identified: `//*[@id="app"]/div/div/div[1]/div/div[2]/span/div/section/div
 
 # Scraping Procedure
 We start with defining a few key components (the required libraries, starting url, and key XPath/CSS selectors):
-
 ```{r get job titles, echo=TRUE}
 library(rvest)
 
@@ -81,6 +80,34 @@ do.call(rbind, strsplit(titles, ". ", fixed = TRUE))
 job.details
 ```
 
+
+
+# ```{r get job titles, echo=TRUE}
+# library(rvest)
+# 
+# ##CREDIT for initial code: Grant Dick (Lecturer)
+# 
+# url <-
+# "https://www.cnbc.com/2017/03/27/the-9-most-in-demand-jobs-of-2017.html"
+# page <- read_html(url)
+# 
+# job.selector <- "div.group"
+# jobs <- html_nodes(page, job.selector)
+# 
+# title.selector <- "p > strong"
+# titles <- html_nodes(jobs, title.selector)
+# titles <- html_text(titles, trim = TRUE)
+# 
+# 
+# titles <- titles[nchar(titles) > 0]
+# job.details <-
+# do.call(rbind, strsplit(titles, ". ", fixed = TRUE))
+# 
+# job.details
+# 
+# 
+# ```
+
 However for the second part and the third part for this website, we have to exclude other paragraphs. Hence, we have to extract the relevant page elements using XPath because the CSS selectors are giving us all of the <p> elements, and add them into a results list (steps 2 a, b, and c in our previously defined workflow). :
 
 ```{r salaries, echo=TRUE}
@@ -91,7 +118,7 @@ salaries <- html_nodes(jobs, xpath = salary.selector)
 salaries <- html_text(salaries, trim = TRUE)
 
 salaries <- strsplit(salaries, "5. Information security analyst", fixed = TRUE)
-salaries <- gsub("\n", "", salaries)
+salaries <- gsub("\n","", salaries)
 
 
 salaries
@@ -111,21 +138,18 @@ hiring.growths
 ```
 
 ```{r hiring growth rate, echo=TRUE}
-url<- "https://www.seek.co.nz/"
-page<- read_html(url)
-seek.selector <-"//*[@id='app']/div/div/div[1]/div/div[2]/span/div/section/div/div/div[2]/div/div[2]/div/div[1]/article[6]/div[1]"
-seek<- html_nodes(salary, xpath = seek.selector)
-
+cnbc<- matrix(cbind(job.details,salaries,hiring.growths), nrow = 9, ncol = 4)
+cnbc
 ```
 
 
 ```{r new DF, echo=TRUE}
-cnbc<- c(job.details,salaries,hiring.growths)
-str(cnbc_df)
+cnbc<- matrix(cbind(job.details,salaries,hiring.growths), nrow = 9, ncol = 4)
+data.frame(cnbc)
 ```
 
 ```{r hiring growth rate, echo=TRUE}
-as.character(cnbc.factor)
+with(cnbc, plot)
 ```
 
 
@@ -149,6 +173,10 @@ job.details <-
 do.call(rbind, strsplit(titles, ". ", fixed = TRUE))
 
 job.details
+```
+
+```{r hiring growth rate, echo=TRUE}
+
 ```
 
 
