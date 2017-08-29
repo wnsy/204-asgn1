@@ -1,0 +1,199 @@
+---
+title: "INFO 204 Assignment 1 Template - Data Science Job Locations"
+date: "18 August 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+<span style="color: #ce2227">
+**_If you have worked on this assignment in groups, then only a single submission is required from the group, but you should make a note of collaborators at the start of the document_**
+</span>
+
+# Group Members
+- Ayesha Wan Ismail
+- Bhavisha Solanki
+- Ruth Banda
+
+# Problem Definition
+
+Finding the most in-demand jobs around the world right now to see which countries/continents lack in which set of skill and also use this as a general guideline template for future students to look through in order to make relevant and practical study choices. Other question that we can ask would be is there a vast difference between countries and if there is a bias between the choices made by the population in these countries? 
+
+
+To answer this question, we could follow this manual process:
+
+  1. Visit the [Western Union] website and go to a blog article "[The Most In-Demand Careers Around the World]". 
+  2. Underneath the main title, within sub-headings, we would see a list of jobs in-demand and the countries which are in short of them:
+    a. Identify the jobs list (e.g. Teachers, Accountants) headings and countries in demand.
+    b. Populate it into a vector.
+    c. Add the identified location information to our list of results
+    
+  
+## Required Components
+
+
+We are using Chrome Developer tools to get the XPath of the countries in demand section in the website to get raw data to plot the jobs in demand against. This data will aid us in plotting our graphs and to find trends within countries (y-axis: jobs in demand, x-axis: list of countries). 
+
+
+1. Visit the [CNBC] website and go to a blog article "[The 9 most-in-demand jobs of 2017]". 
+  2. Underneath the main title, within sub-headings, we would see a list of jobs in-demand, their current salary and the projected hiring growth of that job by 2024:
+    a. Identify the 9 jobs in demand (e.g. Registered Nurse, Data Scientist) and projected hiring growth by 2024.
+    b. Populate it into a table.
+    c. Add the identified location information to our list of results
+    
+//second website screenshot HERE
+
+### Seek website
+- go to seek website, 
+- identify the XPath for the job title from the search result page
+`//*[@id="app"]/div/div/div[1]/div/div[2]/span/div/section/div/div/div[2]/div[2]/div[2]/div/div[1]/article[3]`
+
+XPath identified: `//*[@id="app"]/div/div/div[1]/div/div[2]/span/div/section/div/div/div[2]/div/div[2]/div/div[1]/article[3]`
+
+
+`#app > div > div > div:nth-child(3) > div > div._1qkS_Nq._1XnlU0N > span > div > section > div > div > div._3stY0dI > div._3mWBIbx._1NlRMHD > div:nth-child(2) > div > div._365Hwu1._14yeqbb > article:nth-child(3)`
+
+# Scraping Procedure
+We start with defining a few key components (the required libraries, starting url, and key XPath/CSS selectors):
+```{r get job titles, echo=TRUE}
+library(rvest)
+
+##CREDIT for initial code: Grant Dick (Lecturer)
+
+url <-
+"https://www.cnbc.com/2017/03/27/the-9-most-in-demand-jobs-of-2017.html"
+page <- read_html(url)
+
+job.selector <- "div.group"
+jobs <- html_nodes(page, job.selector)
+
+title.selector <- "p > strong"
+titles <- html_nodes(jobs, title.selector)
+titles <- html_text(titles, trim = TRUE)
+
+
+titles <- titles[nchar(titles) > 0]
+job.details <-
+do.call(rbind, strsplit(titles, ". ", fixed = TRUE))
+
+job.details
+```
+
+
+
+# ```{r get job titles, echo=TRUE}
+# library(rvest)
+# 
+# ##CREDIT for initial code: Grant Dick (Lecturer)
+# 
+# url <-
+# "https://www.cnbc.com/2017/03/27/the-9-most-in-demand-jobs-of-2017.html"
+# page <- read_html(url)
+# 
+# job.selector <- "div.group"
+# jobs <- html_nodes(page, job.selector)
+# 
+# title.selector <- "p > strong"
+# titles <- html_nodes(jobs, title.selector)
+# titles <- html_text(titles, trim = TRUE)
+# 
+# 
+# titles <- titles[nchar(titles) > 0]
+# job.details <-
+# do.call(rbind, strsplit(titles, ". ", fixed = TRUE))
+# 
+# job.details
+# 
+# 
+# ```
+
+However for the second part and the third part for this website, we have to exclude other paragraphs. Hence, we have to extract the relevant page elements using XPath because the CSS selectors are giving us all of the <p> elements, and add them into a results list (steps 2 a, b, and c in our previously defined workflow). :
+
+```{r salaries, echo=TRUE}
+##CREDIT for initial code: Grant Dick (Lecturer)
+
+salary.selector <- "//p[contains(text(), 'Salary: ')]"
+salaries <- html_nodes(jobs, xpath = salary.selector)
+salaries <- html_text(salaries, trim = TRUE)
+
+salaries <- strsplit(salaries, "5. Information security analyst", fixed = TRUE)
+salaries <- gsub("\n","", salaries)
+
+
+salaries
+
+```
+
+Next, we are going to extract the Projected hiring growth by 2024. We use XPath to get the information:
+```{r hiring growth rate, echo=TRUE}
+
+growth.selector <- "//p[contains(text(), '%')]"
+# growth.title.selector <- "div > div > p"
+hiring.growths <- html_nodes(jobs, xpath=growth.selector)
+hiring.growths <- html_text(hiring.growths)
+
+hiring.growths
+
+```
+
+```{r hiring growth rate, echo=TRUE}
+cnbc<- matrix(cbind(job.details,salaries,hiring.growths), nrow = 9, ncol = 4)
+cnbc
+```
+
+
+```{r new DF, echo=TRUE}
+cnbc<- matrix(cbind(job.details,salaries,hiring.growths), nrow = 9, ncol = 4)
+data.frame(cnbc)
+```
+
+```{r hiring growth rate, echo=TRUE}
+with(cnbc, plot)
+```
+
+
+### Seek website
+
+```{r get job titles, echo=TRUE}
+url <-
+"https://www.seek.co.nz/truck-driver-jobs"
+page <- read_html(url)
+
+job.selector <- "//*[@id='app']/div/div/div[1]/div/div[2]/span/div/section/div/div/div[2]/div/div[2]/div/"
+jobs <- html_nodes(page, job.selector)
+
+title.selector <- "p > strong"
+titles <- html_nodes(jobs, title.selector)
+titles <- html_text(titles, trim = TRUE)
+
+
+titles <- titles[nchar(titles) > 0]
+job.details <-
+do.call(rbind, strsplit(titles, ". ", fixed = TRUE))
+
+job.details
+```
+
+```{r hiring growth rate, echo=TRUE}
+
+```
+
+
+# Analysis
+Our `job.locations` vector is now complete, and should contain an entry for every job advertised. Now, we can create a tally of these locations and plot them using a suitable method (e.g., a bar plot):
+```{r summary, echo=TRUE, fig.align="center", out.width="100%"}
+# tally <- table(job.locations)
+# barplot(tally, main="Location of Data Science Jobs on Seek", ylab="# Jobs Found", col="#00508f")
+```
+
+The analysis done here suggests that the majority of data science jobs are in the North Island and centred around either Auckland or Wellington.
+
+## Assumptions
+The analysis here is rather simple - we have only really considered a single search for jobs on a single web site. To be more rigorous, we should examine multiple web sites, and maybe attempt to consider other terms often confused with or related to "data science" (e.g., "predictive analytics", "data mining", "machine learning").
+
+[Seek]: https://seek.co.nz
+[query results]: https://www.seek.co.nz/jobs?keywords=%22data+science%22
+
+
+
