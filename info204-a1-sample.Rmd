@@ -80,34 +80,23 @@ do.call(rbind, strsplit(titles, ". ", fixed = TRUE))
 job.details
 ```
 
+```{r salaries, echo=TRUE}
+library(rvest)
+##CREDIT for initial code: Grant Dick (Lecturer)
 
+url <- "https://www.cnbc.com/2017/03/27/the-9-most-in-demand-jobs-of-2017.html"
+page <- read_html(url)
+job.selector <- job.selector <- "div.group"
+jobs <- html_nodes(page, job.selector)
+title.selector <- "p > strong"
+titles <- html_nodes(jobs, title.selector)
+titles <- html_text(titles, trim = TRUE)
 
-# ```{r get job titles, echo=TRUE}
-# library(rvest)
-# 
-# ##CREDIT for initial code: Grant Dick (Lecturer)
-# 
-# url <-
-# "https://www.cnbc.com/2017/03/27/the-9-most-in-demand-jobs-of-2017.html"
-# page <- read_html(url)
-# 
-# job.selector <- "div.group"
-# jobs <- html_nodes(page, job.selector)
-# 
-# title.selector <- "p > strong"
-# titles <- html_nodes(jobs, title.selector)
-# titles <- html_text(titles, trim = TRUE)
-# 
-# 
-# titles <- titles[nchar(titles) > 0]
-# job.details <-
-# do.call(rbind, strsplit(titles, ". ", fixed = TRUE))
-# 
-# job.details
-# 
-# 
-# ```
+titles <- titles[nchar(titles) >0]
+job.details <- do.call(rbind, strsplit(titles, ". ", fixed = TRUE))
 
+job.details
+```
 However for the second part and the third part for this website, we have to exclude other paragraphs. Hence, we have to extract the relevant page elements using XPath because the CSS selectors are giving us all of the <p> elements, and add them into a results list (steps 2 a, b, and c in our previously defined workflow). :
 
 ```{r salaries, echo=TRUE}
@@ -124,6 +113,8 @@ salaries <- gsub("\n","", salaries)
 salaries
 
 ```
+
+
 
 Next, we are going to extract the Projected hiring growth by 2024. We use XPath to get the information:
 ```{r hiring growth rate, echo=TRUE}
@@ -144,12 +135,26 @@ cnbc
 
 
 ```{r new DF, echo=TRUE}
-cnbc<- matrix(cbind(job.details,salaries,hiring.growths), nrow = 9, ncol = 4)
-data.frame(cnbc)
+#cnbc<- matrix(cbind(job.details,salaries,hiring.growths, nrow = 9, ncol = 3))
+df <-data.frame(cnbc)
+df <- cnbc[, c(1,2,3,4)]
+df
 ```
 
 ```{r hiring growth rate, echo=TRUE}
-with(cnbc, plot)
+#ggplot(df, aes(df))
+#plot(c(cnbc))
+#x<-salaries
+#y<-hiring.growths
+#plot(x,y,xlab="x", ylab="y",pch=19)
+
+```
+
+
+```{r hiring growth rate, echo=TRUE}
+#plot(hiring.growths,job.details, main="Scatterplot",
+# xlab ="hiring.growths" , ylab="job.details", #pch=19)
+
 ```
 
 
