@@ -32,20 +32,22 @@ To answer this question, we could follow this manual process:
   
 ## Required Components
 
-
+### CNBC website
 We are using Chrome Developer tools to get the XPath of the countries in demand section in the website to get raw data to plot the jobs in demand against. This data will aid us in plotting our graphs and to find trends within countries (y-axis: jobs in demand, x-axis: list of countries). 
 
 
 1. Visit the [CNBC] website and go to a blog article "[The 9 most-in-demand jobs of 2017]". 
-  2. Underneath the main title, within sub-headings, we would see a list of jobs in-demand, their current salary and the projected hiring growth of that job by 2024:
+2. Underneath the main title, within sub-headings, we would see a list of jobs in-demand, their current salary and the projected hiring growth of that job by 2024:
     a. Identify the 9 jobs in demand (e.g. Registered Nurse, Data Scientist) and projected hiring growth by 2024.
     b. Populate it into a table.
     c. Add the identified location information to our list of results
+3. Identify the XPath and CSS selectors for the job titles based on their ranks, salaries, and the projected hiring growth of that job by 2024.
+
     
 //second website screenshot HERE
 
 ### Seek website
-- go to seek website, 
+Then, to investigate the claim made by the [CNBC] article,  
 - identify the XPath for the job title from the search result page
 `//*[@id="app"]/div/div/div[1]/div/div[2]/span/div/section/div/div/div[2]/div[2]/div[2]/div/div[1]/article[3]`
 
@@ -110,45 +112,184 @@ hiring.growths
 
 ```
 
-```{r hiring growth rate, echo=TRUE}
-url<- "https://www.seek.co.nz/"
-page<- read_html(url)
-seek.selector <-"//*[@id='app']/div/div/div[1]/div/div[2]/span/div/section/div/div/div[2]/div/div[2]/div/div[1]/article[6]/div[1]"
-seek<- html_nodes(salary, xpath = seek.selector)
-
-```
 
 
 ```{r new DF, echo=TRUE}
-cnbc<- c(job.details,salaries,hiring.growths)
-str(cnbc_df)
+#cnbc<- c(job.details,salaries,hiring.growths)
+#str(cnbc_df)
 ```
 
-```{r hiring growth rate, echo=TRUE}
-as.character(cnbc.factor)
+```{r convert to something else , echo=TRUE}
+#as.character(cnbc.factor)
 ```
 
 
 ### Seek website
 
-```{r get job titles, echo=TRUE}
+```{r search results for truck driver jobs, echo=TRUE}
 url <-
 "https://www.seek.co.nz/truck-driver-jobs"
 page <- read_html(url)
 
-job.selector <- "//*[@id='app']/div/div/div[1]/div/div[2]/span/div/section/div/div/div[2]/div/div[2]/div/"
-jobs <- html_nodes(page, job.selector)
 
-title.selector <- "p > strong"
-titles <- html_nodes(jobs, title.selector)
-titles <- html_text(titles, trim = TRUE)
+search.selector <- "#SearchSummary > strong"
+truck.drivers <- html_nodes(page, search.selector)
+truck.drivers <- html_text(truck.drivers)
+
+truck.drivers
+```
+
+```{r find the salary for truck driver, echo=TRUE}
+
+url <- "https://www.seek.co.nz/truck-driver-jobs?page=3&salaryrange=40000-999999&salarytype=annual#"
+page <- read_html(url)
 
 
-titles <- titles[nchar(titles) > 0]
-job.details <-
-do.call(rbind, strsplit(titles, ". ", fixed = TRUE))
+search.selector <- "#SearchSummary > strong"
+truck.drivers <- html_nodes(page, search.selector)
+truck.drivers <- html_text(truck.drivers)
 
-job.details
+truck.drivers
+
+search.selector <- "//article[4]/div[1]/span[3]" #XPath selector
+get.salary <- html_nodes(page, xpath=search.selector)
+get.salary <- html_text(get.salary)
+
+get.salary
+
+```
+
+
+```{r search results for General business manager and operations manager, echo=TRUE}
+url <-
+"https://www.seek.co.nz/General-business-manager-and-operations-manager-jobs?classification=7019%2C6251%2C1203%2C6076%2C6317%2C6043%2C6362&subclassification=6256%2C6253%2C6259%2C6082%2C6081%2C6080%2C6047%2C6046%2C6045%2C6044%2C6365%2C6366%2C6363%2C6254"
+page <- read_html(url)
+
+
+search.selector <- "#SearchSummary > strong"
+managers <- html_nodes(page, search.selector)
+managers <- html_text(managers)
+
+managers
+```
+
+
+```{r search results for Data Scientist, echo=TRUE}
+url <-
+"https://www.seek.co.nz/Data-scientist-jobs"
+page <- read_html(url)
+
+
+search.selector <- "#SearchSummary > strong"
+data.scientists <- html_nodes(page, search.selector)
+data.scientists <- html_text(data.scientists)
+
+data.scientists
+```
+
+```{r search results for Registered Nurse, echo=TRUE}
+url <-
+"https://www.seek.co.nz/Registered-Nurse-jobs"
+page <- read_html(url)
+
+
+search.selector <- "#SearchSummary > strong"
+registered.nurse <- html_nodes(page, search.selector)
+registered.nurse <- html_text(registered.nurse)
+
+registered.nurse
+```
+
+
+```{r search results for Information Security Analyst, echo=TRUE}
+url <-
+"https://www.seek.co.nz/Information-security-analyst-jobs"
+page <- read_html(url)
+
+
+search.selector <- "#SearchSummary > strong"
+info.security.analyst <- html_nodes(page, search.selector)
+info.security.analyst <- html_text(info.security.analyst)
+
+info.security.analyst
+```
+
+```{r search results for software engineer, echo=TRUE}
+url <-
+"https://www.seek.co.nz/Software-Engineer-jobs"
+page <- read_html(url)
+
+
+search.selector <- "#SearchSummary > strong"
+software.engineers <- html_nodes(page, search.selector)
+software.engineers <- html_text(software.engineers)
+
+software.engineers
+```
+
+```{r search results for Financial Advisor, echo=TRUE}
+url <-
+"https://www.seek.co.nz/Financial-Advisor-jobs"
+page <- read_html(url)
+
+
+search.selector <- "#SearchSummary > strong"
+financial.advisor <- html_nodes(page, search.selector)
+financial.advisor <- html_text(financial.advisor)
+
+financial.advisor
+```
+
+
+```{r search results for physical therapist, echo=TRUE}
+url <-
+"https://www.seek.co.nz/Physical-therapist-jobs"
+page <- read_html(url)
+
+
+search.selector <- "#SearchSummary > strong"
+physical.therapist <- html_nodes(page, search.selector)
+physical.therapist <- html_text(physical.therapist)
+
+physical.therapist
+
+
+#HOWEVER, if we go for Physiotherapist title on the Seek search website, we will get results. Observation, different titles in some countries may result in minor confusion when doing web scraping
+
+url <-
+"https://www.seek.co.nz/Physiotherapist-jobs"
+page <- read_html(url)
+
+
+search.selector <- "#SearchSummary > strong"
+physiotherapist <- html_nodes(page, search.selector)
+physiotherapist <- html_text(physiotherapist)
+
+physiotherapist
+
+```
+
+```{r search results for home health aide jobs, echo=TRUE}
+url <-
+"https://www.seek.co.nz/Home-Health-Aide-jobs"
+page <- read_html(url)
+
+
+search.selector <- "#SearchSummary > strong"
+home.health.aide <- html_nodes(page, search.selector)
+home.health.aide <- html_text(home.health.aide)
+
+home.health.aide
+```
+
+
+```{r get salary for jobs on, echo=TRUE}
+url <- "https://www.seek.co.nz/truck-driver-jobs?page=3&salaryrange=40000-999999&salarytype=annual#"
+page <- read_html(url)
+salary.selector <-"//*[@id='app']/div/div/div[1]/div/div[2]/span/div/section/div/div/div[2]/div/div[2]/div/div[1]/article[6]/div[1]"
+#seek<- html_nodes(salary, xpath = seek.selector)
+
+title.salary.selector <- "#app > div > div > div:nth-child(3) > div > div._1qkS_Nq._3sqzogv._1XnlU0N > span > div > section > div > div > div._3stY0dI > div > div:nth-child(2) > div > div._365Hwu1._14yeqbb > article:nth-child(4) > div._1mzsMx5 > span:nth-child(3)"
 ```
 
 
@@ -164,6 +305,7 @@ The analysis done here suggests that the majority of data science jobs are in th
 ## Assumptions
 The analysis here is rather simple - we have only really considered a single search for jobs on a single web site. To be more rigorous, we should examine multiple web sites, and maybe attempt to consider other terms often confused with or related to "data science" (e.g., "predictive analytics", "data mining", "machine learning").
 
+[CNBC]: https://www.cnbc.com/2017/03/27/the-9-most-in-demand-jobs-of-2017.html
 [Seek]: https://seek.co.nz
 [query results]: https://www.seek.co.nz/jobs?keywords=%22data+science%22
 
