@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ---
 title: "INFO 204 Assignment 1 Template - Data Science Job Locations"
 date: "18 August 2017"
@@ -17,330 +16,22 @@ knitr::opts_chunk$set(echo = TRUE)
 - Bhavisha Solanki
 - Ruth Banda
 
-# Problem Definition
+This assignment template should be considered a rough guide as an acceptable type of project for your first INFO 204 assignment. You can deviate from the actual process (e.g., scrape pages from two different web sites), but the main points to focus on are that:
 
-Finding the most in-demand jobs around the world right now to see which countries/continents lack in which set of skill and also use this as a general guideline template for future students to look through in order to make relevant and practical study choices. Other question that we can ask would be is there a vast difference between countries and if there is a bias between the choices made by the population in these countries? 
-
-
-To answer this question, we could follow this manual process:
-
-  1. Visit the [Western Union] website and go to a blog article "[The Most In-Demand Careers Around the World]". 
-  2. Underneath the main title, within sub-headings, we would see a list of jobs in-demand and the countries which are in short of them:
-    a. Identify the jobs list (e.g. Teachers, Accountants) headings and countries in demand.
-    b. Populate it into a vector.
-    c. Add the identified location information to our list of results
-    
+  1. you provide a clear description of your problem that can be followed without any specific code; and
+  2. your code matches the description of your workflow.
   
-## Required Components
-
-### CNBC website
-We are using Chrome Developer tools to get the XPath of the countries in demand section in the website to get raw data to plot the jobs in demand against. This data will aid us in plotting our graphs and to find trends within countries (y-axis: jobs in demand, x-axis: list of countries). 
-
-
-1. Visit the [CNBC] website and go to a blog article "[The 9 most-in-demand jobs of 2017]". 
-2. Underneath the main title, within sub-headings, we would see a list of jobs in-demand, their current salary and the projected hiring growth of that job by 2024:
-    a. Identify the 9 jobs in demand (e.g. Registered Nurse, Data Scientist) and projected hiring growth by 2024.
-    b. Populate it into a table.
-    c. Add the identified location information to our list of results
-3. Identify the XPath and CSS selectors for the job titles based on their ranks, salaries, and the projected hiring growth of that job by 2024.
-
-    
-//second website screenshot HERE
-
-### Seek website
-Then, to investigate the claim made by the [CNBC] article,  
-- identify the XPath for the job title from the search result page
-`//*[@id="app"]/div/div/div[1]/div/div[2]/span/div/section/div/div/div[2]/div[2]/div[2]/div/div[1]/article[3]`
-
-XPath identified: `//*[@id="app"]/div/div/div[1]/div/div[2]/span/div/section/div/div/div[2]/div/div[2]/div/div[1]/article[3]`
-
-
-`#app > div > div > div:nth-child(3) > div > div._1qkS_Nq._1XnlU0N > span > div > section > div > div > div._3stY0dI > div._3mWBIbx._1NlRMHD > div:nth-child(2) > div > div._365Hwu1._14yeqbb > article:nth-child(3)`
-
-# Scraping Procedure
-We start with defining a few key components (the required libraries, starting url, and key XPath/CSS selectors):
-
-```{r get job titles, echo=TRUE}
-library(rvest)
-
-##CREDIT for initial code: Grant Dick (Lecturer)
-
-url <-
-"https://www.cnbc.com/2017/03/27/the-9-most-in-demand-jobs-of-2017.html"
-page <- read_html(url)
-
-job.selector <- "div.group"
-jobs <- html_nodes(page, job.selector)
-
-title.selector <- "p > strong"
-titles <- html_nodes(jobs, title.selector)
-titles <- html_text(titles, trim = TRUE)
-
-
-titles <- titles[nchar(titles) > 0]
-job.details <-
-do.call(rbind, strsplit(titles, ". ", fixed = TRUE))
-
-job.details
-```
-
-However for the second part and the third part for this website, we have to exclude other paragraphs. Hence, we have to extract the relevant page elements using XPath because the CSS selectors are giving us all of the <p> elements, and add them into a results list (steps 2 a, b, and c in our previously defined workflow). :
-
-```{r salaries, echo=TRUE}
-##CREDIT for initial code: Grant Dick (Lecturer)
-
-salary.selector <- "//p[contains(text(), 'Salary: ')]"
-salaries <- html_nodes(jobs, xpath = salary.selector)
-salaries <- html_text(salaries, trim = TRUE)
-
-salaries <- strsplit(salaries, "5. Information security analyst", fixed = TRUE)
-salaries <- gsub("\n", "", salaries)
-
-
-salaries
-
-```
-
-Next, we are going to extract the Projected hiring growth by 2024. We use XPath to get the information:
-```{r hiring growth rate, echo=TRUE}
-
-growth.selector <- "//p[contains(text(), '%')]"
-# growth.title.selector <- "div > div > p"
-hiring.growths <- html_nodes(jobs, xpath=growth.selector)
-hiring.growths <- html_text(hiring.growths)
-
-hiring.growths
-
-```
-
-
-
-```{r new DF, echo=TRUE}
-#cnbc<- c(job.details,salaries,hiring.growths)
-#str(cnbc_df)
-```
-
-```{r convert to something else , echo=TRUE}
-#as.character(cnbc.factor)
-```
-
-
-### Seek website
-
-```{r search results for truck driver jobs, echo=TRUE}
-url <-
-"https://www.seek.co.nz/truck-driver-jobs"
-page <- read_html(url)
-
-
-search.selector <- "#SearchSummary > strong"
-truck.drivers <- html_nodes(page, search.selector)
-truck.drivers <- html_text(truck.drivers)
-
-truck.drivers
-```
-
-```{r find the salary for truck driver, echo=TRUE}
-
-url <- "https://www.seek.co.nz/truck-driver-jobs?page=3&salaryrange=40000-999999&salarytype=annual#"
-page <- read_html(url)
-
-
-search.selector <- "#SearchSummary > strong"
-truck.drivers <- html_nodes(page, search.selector)
-truck.drivers <- html_text(truck.drivers)
-
-truck.drivers
-
-search.selector <- "//article[4]/div[1]/span[3]" #XPath selector
-get.salary <- html_nodes(page, xpath=search.selector)
-get.salary <- html_text(get.salary)
-
-get.salary
-
-```
-
-
-```{r search results for General business manager and operations manager, echo=TRUE}
-url <-
-"https://www.seek.co.nz/General-business-manager-and-operations-manager-jobs?classification=7019%2C6251%2C1203%2C6076%2C6317%2C6043%2C6362&subclassification=6256%2C6253%2C6259%2C6082%2C6081%2C6080%2C6047%2C6046%2C6045%2C6044%2C6365%2C6366%2C6363%2C6254"
-page <- read_html(url)
-
-
-search.selector <- "#SearchSummary > strong"
-managers <- html_nodes(page, search.selector)
-managers <- html_text(managers)
-
-managers
-```
-
-
-```{r search results for Data Scientist, echo=TRUE}
-url <-
-"https://www.seek.co.nz/Data-scientist-jobs"
-page <- read_html(url)
-
-
-search.selector <- "#SearchSummary > strong"
-data.scientists <- html_nodes(page, search.selector)
-data.scientists <- html_text(data.scientists)
-
-data.scientists
-```
-
-```{r search results for Registered Nurse, echo=TRUE}
-url <-
-"https://www.seek.co.nz/Registered-Nurse-jobs"
-page <- read_html(url)
-
-
-search.selector <- "#SearchSummary > strong"
-registered.nurse <- html_nodes(page, search.selector)
-registered.nurse <- html_text(registered.nurse)
-
-registered.nurse
-```
-
-
-```{r search results for Information Security Analyst, echo=TRUE}
-url <-
-"https://www.seek.co.nz/Information-security-analyst-jobs"
-page <- read_html(url)
-
-
-search.selector <- "#SearchSummary > strong"
-info.security.analyst <- html_nodes(page, search.selector)
-info.security.analyst <- html_text(info.security.analyst)
-
-info.security.analyst
-```
-
-```{r search results for software engineer, echo=TRUE}
-url <-
-"https://www.seek.co.nz/Software-Engineer-jobs"
-page <- read_html(url)
-
-
-search.selector <- "#SearchSummary > strong"
-software.engineers <- html_nodes(page, search.selector)
-software.engineers <- html_text(software.engineers)
-
-software.engineers
-```
-
-```{r search results for Financial Advisor, echo=TRUE}
-url <-
-"https://www.seek.co.nz/Financial-Advisor-jobs"
-page <- read_html(url)
-
-
-search.selector <- "#SearchSummary > strong"
-financial.advisor <- html_nodes(page, search.selector)
-financial.advisor <- html_text(financial.advisor)
-
-financial.advisor
-```
-
-
-```{r search results for physical therapist, echo=TRUE}
-url <-
-"https://www.seek.co.nz/Physical-therapist-jobs"
-page <- read_html(url)
-
-
-search.selector <- "#SearchSummary > strong"
-physical.therapist <- html_nodes(page, search.selector)
-physical.therapist <- html_text(physical.therapist)
-
-physical.therapist
-
-
-#HOWEVER, if we go for Physiotherapist title on the Seek search website, we will get results. Observation, different titles in some countries may result in minor confusion when doing web scraping
-
-url <-
-"https://www.seek.co.nz/Physiotherapist-jobs"
-page <- read_html(url)
-
-
-search.selector <- "#SearchSummary > strong"
-physiotherapist <- html_nodes(page, search.selector)
-physiotherapist <- html_text(physiotherapist)
-
-physiotherapist
-
-```
-
-```{r search results for home health aide jobs, echo=TRUE}
-url <-
-"https://www.seek.co.nz/Home-Health-Aide-jobs"
-page <- read_html(url)
-
-
-search.selector <- "#SearchSummary > strong"
-home.health.aide <- html_nodes(page, search.selector)
-home.health.aide <- html_text(home.health.aide)
-
-home.health.aide
-```
-
-
-```{r get salary for jobs on, echo=TRUE}
-url <- "https://www.seek.co.nz/truck-driver-jobs?page=3&salaryrange=40000-999999&salarytype=annual#"
-page <- read_html(url)
-salary.selector <-"//*[@id='app']/div/div/div[1]/div/div[2]/span/div/section/div/div/div[2]/div/div[2]/div/div[1]/article[6]/div[1]"
-#seek<- html_nodes(salary, xpath = seek.selector)
-
-title.salary.selector <- "#app > div > div > div:nth-child(3) > div > div._1qkS_Nq._3sqzogv._1XnlU0N > span > div > section > div > div > div._3stY0dI > div > div:nth-child(2) > div > div._365Hwu1._14yeqbb > article:nth-child(4) > div._1mzsMx5 > span:nth-child(3)"
-```
-
-
-# Analysis
-Our `job.locations` vector is now complete, and should contain an entry for every job advertised. Now, we can create a tally of these locations and plot them using a suitable method (e.g., a bar plot):
-```{r summary, echo=TRUE, fig.align="center", out.width="100%"}
-# tally <- table(job.locations)
-# barplot(tally, main="Location of Data Science Jobs on Seek", ylab="# Jobs Found", col="#00508f")
-```
-
-The analysis done here suggests that the majority of data science jobs are in the North Island and centred around either Auckland or Wellington.
-
-## Assumptions
-The analysis here is rather simple - we have only really considered a single search for jobs on a single web site. To be more rigorous, we should examine multiple web sites, and maybe attempt to consider other terms often confused with or related to "data science" (e.g., "predictive analytics", "data mining", "machine learning").
-
-[CNBC]: https://www.cnbc.com/2017/03/27/the-9-most-in-demand-jobs-of-2017.html
-[Seek]: https://seek.co.nz
-[query results]: https://www.seek.co.nz/jobs?keywords=%22data+science%22
-
-
-
-=======
----
-title: "INFO 204 Assignment 1 Template - Data Science Job Locations"
-date: "18 August 2017"
-output: html_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-<span style="color: #ce2227">
-**_If you have worked on this assignment in groups, then only a single submission is required from the group, but you should make a note of collaborators at the start of the document_**
-</span>
-
-# Group Members
-- Ayesha Wan Ismail
-- Bhavisha Solanki
-- Ruth Banda
+Your "analysis" following the data scraping does not need to be comprehensive (see below for how simple it may be). However, if you perform a more substantial analysis of your results, then this will be taken into account should you have missed anything earlier in your assignment and marks that you may have lost in earlier sections may be recovered.
 
 # Problem Definition
 
-Finding the most in-demand jobs around the world right now to see which countries/continents lack in which set of skill and also use this as a general guideline template for future students to look through in order to make relevant and practical study choices. Other question that we can ask would be is there a vast difference between countries and if there is a bias between the choices made by the population in these countries? 
-
+Finding the top 9 most in-demand careers of 2017 and the salary that you receive from working under one of those job category. We will then compare it to see when typed into Seek to search for jobs in New Zealand of those 9 categories how many jobs of them are available in our country and in what city/area. This is for us to compare if the careers are more in demand because it is a low pay job or if it because the country lacks that set of skills and knowledge level or it could just be a mixture of both. Also for the next generation to take into account in deciding careers and what job paths they want to take. So they can understand what jobs are in demand and what is the strong growing field also to know what lacks skills and to work towards gaining more skills and experience for jobs rather than sticking to low pay jobs however that can be a starting point for them when entering into the industry and earning in their initial years and from their can move up and into higher positions.
 
 To answer this question, we could follow this manual process:
 
-  1. Visit the [Western Union] website and go to a blog article "[The Most In-Demand Careers Around the World]". 
-  2. Underneath the main title, within sub-headings, we would see a list of jobs in-demand and the countries which are in short of them:
-    a. Identify the jobs list (e.g. Teachers, Accountants) headings and countries in demand.
+  1. Visit the [Seek] website and go search below specific jobs and where they are available in New Zealand. 
+  2. Underneath the main title, within sub-headings, we would see the space to type in our specified job and click the seek button to see where it is available in the country and how many of that job is available (e.g 50 jobs or 200)
+    a. Identify the jobs list (e.g. Truck Drivers, Registered Nurses) headings and city that requires it as well as show the total number of jobs found at the top when searched.
     b. Populate it into a vector.
     c. Add the identified location information to our list of results
     
@@ -348,7 +39,28 @@ To answer this question, we could follow this manual process:
 ## Required Components
 
 
-We are using Chrome Developer tools to get the XPath of the countries in demand section in the website to get raw data to plot the jobs in demand against. This data will aid us in plotting our graphs and to find trends within countries (y-axis: jobs in demand, x-axis: list of countries). 
+On the "[Seek]" page, under the hob search heading you can search for a particular job and where it is placed:
+
+![Identify the job titles based on the headings](images/seek.png)
+
+We know that the required URL to get the components from is https://www.seek.co.nz/, and as we scroll down, we are able to identify different headings and sub headings and a search button, like below:
+
+![Choose the headings that we are wanting to get information / scrape)](images/truckdriver.png)
+![Choose the headings that we are wanting to get information / scrape)](images/practicenurse.png)
+
+In the next section, we are going to scrape the information below on the seek page after we have clicked the seek button. To do so, we must know how the page structures its documents and what hints can we extract from it to make it easier to identify the pages that we need. Also, we want to extract the number of jobs found  section, so we also have to find the correct CSS selectors. It is very important to use the top left hand corner highlighted showing the number of jobs found so we know how many the country has or lacks of that specific job category and skills related to that. The reason also why they may not take it which may be due to salary which the next website we scrape will compare.
+
+As we try to find the CSS selector for the number of jobs found for the particular jobs searched, we have to figure out how to exclude the paragraphs in CSS sections so that we scrape for number of jobs element under each job heading which is related to the next webpage we will scrape which is the 9 most in demand jobs, it would not get all of the irrelevant paragraphs (p) selectors.
+
+![The parts of the seek page that we need to scrape (compact interface shown)](images/truckdriver1.png)
+![The parts of the seek page that we need to scrape (compact interface shown)](images/practicenurse1.png))
+
+We want to take the job heading and the location it is at the other details are not necessary just the job title and where in the country it is located so can be used to make our graphs. 
+
+
+Image for first website for x path for seek for truck driver (u add it in)
+
+We are using Chrome Developer tools to get the XPath of the number of jobs available for the specific job searched in the seek section in the website. We do this to get the raw data to plot the number of jobs in each category to what that jobs salary provides and the location of the job in the country (e.g south island or north island). This data will aid us in plotting our graphs and to find trends within jobs (y-axis: jobs category and the number available, x-axis: salary of each of the 9 job categories (we get this data fromt he next website we extract)). 
 
 
 1. Visit the [CNBC] website and go to a blog article "[The 9 most-in-demand jobs of 2017]". 
@@ -356,155 +68,129 @@ We are using Chrome Developer tools to get the XPath of the countries in demand 
     a. Identify the 9 jobs in demand (e.g. Registered Nurse, Data Scientist) and projected hiring growth by 2024.
     b. Populate it into a table.
     c. Add the identified location information to our list of results
+ 
+ On the "[The 9 Most In-Demand Jobs of 2017]" article, the page contains a list of jobs:
+
+![Identify the job titles based on the headings](images/9mostindemandjobs.png)   
     
-//second website screenshot HERE
+We know that the required URL to get the components from is https://www.cnbc.com/2017/03/27/the-9-most-in-demand-jobs-of-2017.html, and as we scroll down, we are able to identify the job titles headings and sub headings. In this section, we are going to scrape the job titles and salary title to compare with the seek website. To do so, we must know how the page structures its documents and what hints can we extract from it to make it easier to identify the pages that we need. Also, we want to extract the 'Salary' section and the "Job title section" with its given rank, so we also have to find the correct CSS selectors. like below:
 
-### Seek website
-- go to seek website, 
-- identify the XPath for the job title from the search result page
-`//*[@id="app"]/div/div/div[1]/div/div[2]/span/div/section/div/div/div[2]/div[2]/div[2]/div/div[1]/article[3]`
-
-XPath identified: `//*[@id="app"]/div/div/div[1]/div/div[2]/span/div/section/div/div/div[2]/div/div[2]/div/div[1]/article[3]`
+![Choose the headings that we are wanting to get information / scrape)](images/9mostindemandhighlighted.png)    
 
 
-`#app > div > div > div:nth-child(3) > div > div._1qkS_Nq._1XnlU0N > span > div > section > div > div > div._3stY0dI > div._3mWBIbx._1NlRMHD > div:nth-child(2) > div > div._365Hwu1._14yeqbb > article:nth-child(3)`
+ code image for 2nd website (with the code) change description below
+As we try to find the CSS selector for the '9 most in demand careers' section, we have to figure out how to exclude the paragraphs in CSS sections so that we scrape for projected growth, it would not get all of the irrelevant paragraphs (p) selectors.
+
+![The parts of the 9 most in demand careers that we need to scrape (compact interface shown)]
+We want to take the 9 careers which are mentioned and the salary of each job which is an estomate of how much each individual earns doing those top 9 most in demand careers. This will show us if there is a relatonship between salary and most in demand careers such as they are in demand as they are a low pay or there is a lack of skills and knowledge around that area in our country. The data is only reliable to New Zealand as we are using a NZ job site therefore is limited to one country which means will be more reliable but can not be assumed for multiple countries and populations.
+
+
+
+<!-- So, once we are on the search results page, we can use the developer tools to explore the source behind the page, and from this, we can see that we need the article elements that have a data-automation attribute setting of 'normalJob': -->
+<!-- ![The parts of the job details that we need to scrape (compact interface shown)](images/xpath-selector-job.png) -->
+<!-- Therefore, we can scrape the required job information with the XPath selector: -->
+<!-- `"//article[@data-automation='normalJob']"` -->
+<!-- Note that we haven't really talked about XPath in INFO 204 - it is an alternative to using CSS selectors that provide more fined-grained control over the access (but the syntax can sometimes be a little bit confusing, so use it only when absolutely necessary!). More details on XPath can be found [at this tutorial](https://www.w3schools.com/xml/xml_xpath.asp). -->
+
+<!-- Similarly, we can use the developer tools to identify what part of these article elements contains the title and hyperlink. A little bit of drilling tells us that the title is an h1 (heading type 1) element, and there in an a (anchor) element under this with the link that we need. Therefore, once we have each of the article elements pertaining to the jobs, we can access the anchor element using the CSS selector: -->
+<!-- `"h1 a"`, and then access the href attribute from this element to get to the next page. -->
+
+<!-- The next page has a fairly simple structure that should be easily scraped: -->
+
+<!-- ![The parts of the dearch results that we need to scrape (compact interface shown)](images/dev-tools-jobdetails.png) -->
+<!-- Once the required element is identified, we can use the developer tools in Chrome to copy the required CSS selector, which is the awkward: -->
+<!-- `"#app > div > div > div:nth-child(3) > div > div > div:nth-child(3) > div > div.PxPTnGA > div > article > div > div:nth-child(1) > span > div > section > dl > dd:nth-child(4) > span > span > strong"`. -->
+<!-- With a bit of tweaking, we can make this selector somewhat less awkward: -->
+<!-- `"dl > dd:nth-child(4) > span > span > strong"`. -->
+
+<!-- With the XPath/CSS selectors identified, and a general workflow in place, we can now proceed with the scraping. -->
 
 # Scraping Procedure
 We start with defining a few key components (the required libraries, starting url, and key XPath/CSS selectors):
+
 ```{r get job titles, echo=TRUE}
 library(rvest)
 
-##CREDIT for initial code: Grant Dick (Lecturer)
+blog.url <- "https://www.westernunion.com/blog/jobs-in-demand/"
+doc.url <- read_html(blog.url)
 
-url <-
-"https://www.cnbc.com/2017/03/27/the-9-most-in-demand-jobs-of-2017.html"
-page <- read_html(url)
-
-job.selector <- "div.group"
-jobs <- html_nodes(page, job.selector)
-
-title.selector <- "p > strong"
-titles <- html_nodes(jobs, title.selector)
-titles <- html_text(titles, trim = TRUE)
-
-
-titles <- titles[nchar(titles) > 0]
-job.details <-
-do.call(rbind, strsplit(titles, ". ", fixed = TRUE))
-
-job.details
+list.jobtitles <- html_nodes(doc.url, "#main > div.row.row-flex.post-single > div > div > div.row.post-data > div > div.post-content > h2")
+raw.data <- html_text(list.jobtitles)
+clean.jobtitles.data <- gsub("[\n]", "", raw.data)
+clean.jobtitles.data
 ```
 
-```{r salaries, echo=TRUE}
+However for the second part, we have to exclude other paragraphs. 
+```{r get countries in demand, echo=TRUE}
+countries.selector <- "//*[@id='main']/div[2]/div/div/div[2]/div/div[3]/p[5]"
+list.paragraphs <- html_nodes(doc.url, xpath=countries.selector)
+raw.paragraphs.data <- html_text(list.paragraphs)
+raw.paragraphs.data
+```
+
+
+
+However for the second part, we have to exclude other paragraphs. We have to perform the iteration over the href attributes that we discovered, extract the relevant page elements, and add them into a results list (steps 2 a, b, and c in our previously defined workflow). :
+```{r get countries in a for loop, echo=TRUE}
+countries.selector <- "//*[@id='main']/div[2]/div/div/div[2]/div/div[3]/p[9]"
+list.paragraphs <- html_nodes(doc.url, xpath=countries.selector)
+raw.paragraphs.data <- html_text(list.paragraphs)
+raw.paragraphs.data
+
+```
+
+
+We start with defining a few key components (the required libraries, starting url, and key XPath/CSS selectors):
+```{r scraping setup, echo=TRUE}
 library(rvest)
-##CREDIT for initial code: Grant Dick (Lecturer)
 
-url <- "https://www.cnbc.com/2017/03/27/the-9-most-in-demand-jobs-of-2017.html"
-page <- read_html(url)
-job.selector <- job.selector <- "div.group"
-jobs <- html_nodes(page, job.selector)
-title.selector <- "p > strong"
-titles <- html_nodes(jobs, title.selector)
-titles <- html_text(titles, trim = TRUE)
-
-titles <- titles[nchar(titles) >0]
-job.details <- do.call(rbind, strsplit(titles, ". ", fixed = TRUE))
-
-job.details
-```
-However for the second part and the third part for this website, we have to exclude other paragraphs. Hence, we have to extract the relevant page elements using XPath because the CSS selectors are giving us all of the <p> elements, and add them into a results list (steps 2 a, b, and c in our previously defined workflow). :
-
-```{r salaries, echo=TRUE}
-##CREDIT for initial code: Grant Dick (Lecturer)
-
-salary.selector <- "//p[contains(text(), 'Salary: ')]"
-salaries <- html_nodes(jobs, xpath = salary.selector)
-salaries <- html_text(salaries, trim = TRUE)
-
-salaries <- strsplit(salaries, "5. Information security analyst", fixed = TRUE)
-salaries <- gsub("\n","", salaries)
-
-
-salaries
-
+search.url <- "https://www.seek.co.nz/jobs?keywords=%22data+science%22"
+job.selector <- "//article[@data-automation='normalJob']" ## note: XPath selector!
+title.selector <- "h1 a"
 ```
 
-
-
-Next, we are going to extract the Projected hiring growth by 2024. We use XPath to get the information:
-```{r hiring growth rate, echo=TRUE}
-
-growth.selector <- "//p[contains(text(), '%')]"
-# growth.title.selector <- "div > div > p"
-hiring.growths <- html_nodes(jobs, xpath=growth.selector)
-hiring.growths <- html_text(hiring.growths)
-
-hiring.growths
-
+As, we're going to be scraping multiple pages, and the source links will be scraped from our start document, we will need to use a session to keep track of the relevant details:
+```{r session, echo=TRUE}
+doc <- html_session(search.url)
 ```
 
-```{r hiring growth rate, echo=TRUE}
-cnbc<- matrix(cbind(job.details,salaries,hiring.growths), nrow = 9, ncol = 4)
-cnbc
+And now, we should retrieve our required list of advertised jobs:
+```{r fetch jobs, echo=TRUE}
+jobs <- html_nodes(doc, xpath=job.selector)
+cat("Fetched", length(jobs), "results\n")
+```
+note that we used the `xpath` parameter of the `html_nodes()` function instead of using a normal CSS selector. This was due to the selection of by attribute status, which cannot be easily done using a CSS selector.
+
+Having found the `r length(jobs)` jobs, we need to extract the required hyperlinks that lead us to the job description pages:
+```{r fetch urls, echo=TRUE}
+job.links <- html_nodes(jobs, title.selector)
+job.href <- html_attr(job.links, "href")
 ```
 
+Now, we perform the iteration over the href attributes that we discovered, extract the relevant page elements, and add them into a results list (steps 2 a, b, and c in our previously defined workflow).
+```{r scraper iteration, echo=TRUE}
+location.selector <- "dl > dd:nth-child(4) > span > span > strong"
+job.locations <- NULL ## a container for our results, starts off empty
+for (job in job.href) {
+  job.loc <- tryCatch({
+    job.doc <- jump_to(doc, job)
+    job.loc <- html_node(job.doc, location.selector)
+    
+    html_text(job.loc)
+  }, error=function(e) NULL)
 
-```{r new DF, echo=TRUE}
-#cnbc<- matrix(cbind(job.details,salaries,hiring.growths, nrow = 9, ncol = 3))
-df <-data.frame(cnbc)
-df <- cnbc[, c(1,2,3,4)]
-df
+  ## add the next location to our results vector
+  job.locations <- c(job.locations, job.loc)
+}
+job.locations
 ```
-
-```{r hiring growth rate, echo=TRUE}
-#ggplot(df, aes(df))
-#plot(c(cnbc))
-#x<-salaries
-#y<-hiring.growths
-#plot(x,y,xlab="x", ylab="y",pch=19)
-
-```
-
-
-```{r hiring growth rate, echo=TRUE}
-#plot(hiring.growths,job.details, main="Scatterplot",
-# xlab ="hiring.growths" , ylab="job.details", #pch=19)
-
-```
-
-
-### Seek website
-
-```{r get job titles, echo=TRUE}
-url <-
-"https://www.seek.co.nz/truck-driver-jobs"
-page <- read_html(url)
-
-job.selector <- "//*[@id='app']/div/div/div[1]/div/div[2]/span/div/section/div/div/div[2]/div/div[2]/div/"
-jobs <- html_nodes(page, job.selector)
-
-title.selector <- "p > strong"
-titles <- html_nodes(jobs, title.selector)
-titles <- html_text(titles, trim = TRUE)
-
-
-titles <- titles[nchar(titles) > 0]
-job.details <-
-do.call(rbind, strsplit(titles, ". ", fixed = TRUE))
-
-job.details
-```
-
-```{r hiring growth rate, echo=TRUE}
-
-```
-
+Note the use of the `tryCatch()` function here - this is to handle any cases where following a link may produce an error (e.g., a 404 error for a broken link referring to a missing page).
 
 # Analysis
 Our `job.locations` vector is now complete, and should contain an entry for every job advertised. Now, we can create a tally of these locations and plot them using a suitable method (e.g., a bar plot):
 ```{r summary, echo=TRUE, fig.align="center", out.width="100%"}
-# tally <- table(job.locations)
-# barplot(tally, main="Location of Data Science Jobs on Seek", ylab="# Jobs Found", col="#00508f")
+tally <- table(job.locations)
+barplot(tally, main="Location of Data Science Jobs on Seek", ylab="# Jobs Found", col="#00508f")
 ```
 
 The analysis done here suggests that the majority of data science jobs are in the North Island and centred around either Auckland or Wellington.
@@ -514,7 +200,7 @@ The analysis here is rather simple - we have only really considered a single sea
 
 [Seek]: https://seek.co.nz
 [query results]: https://www.seek.co.nz/jobs?keywords=%22data+science%22
+[Western Union]: https://www.westernunion.com/
+[The Most In-Demand Careers Around the World]: https://www.westernunion.com/blog/jobs-in-demand/
 
 
-
->>>>>>> 9651e97820c735d7b5f8c4f1e6ee602723949155
