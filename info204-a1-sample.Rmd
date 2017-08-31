@@ -18,43 +18,100 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Problem Definition
 
-Finding the most in-demand jobs around the world right now to see which countries/continents lack in which set of skill and also use this as a general guideline template for future students to look through in order to make relevant and practical study choices. Other question that we can ask would be is there a vast difference between countries and if there is a bias between the choices made by the population in these countries? 
-
+Finding the top 9 most in-demand careers of 2017 and the salary that you receive from working under one of those job category. We will then compare it to see when typed into Seek to search for jobs in New Zealand of those 9 categories how many jobs of them are available in our country and in what city/area. This is for us to compare if the careers are more in demand because it is a low pay job or if it because the country lacks that set of skills and knowledge level or it could just be a mixture of both. Also for the next generation to take into account in deciding careers and what job paths they want to take. So they can understand what jobs are in demand and what is the strong growing field also to know what lacks skills and to work towards gaining more skills and experience for jobs rather than sticking to low pay jobs however that can be a starting point for them when entering into the industry and earning in their initial years and from their can move up and into higher positions.
 
 To answer this question, we could follow this manual process:
 
-  1. Visit the [Western Union] website and go to a blog article "[The Most In-Demand Careers Around the World]". 
-  2. Underneath the main title, within sub-headings, we would see a list of jobs in-demand and the countries which are in short of them:
-    a. Identify the jobs list (e.g. Teachers, Accountants) headings and countries in demand.
+
+  1. Visit the [CNBC] website and go to a blog article "[The 9 most-in-demand jobs of 2017]". 
+  2. Underneath the main title, within sub-headings, we would see a list of jobs in-demand, their current salary and the projected hiring growth of that job by 2024:
+    a. Identify the 9 jobs in demand (e.g. Registered Nurse, Data Scientist) and projected hiring growth by 2024.
+    b. Populate it into a table.
+    c. Add the identified location information to our list of results
+ 
+  3. Visit the [Seek] website and go search below specific jobs and where they are available in New Zealand. 
+  4. Underneath the main title, within sub-headings, we would see the space to type in our specified job and click the seek button to see where it is available in the country and how many of that job is available (e.g 50 jobs or 200)
+    a. Identify the jobs list (e.g. Truck Drivers, Registered Nurses) headings and city that requires it as well as show the total number of jobs found at the top when searched.
     b. Populate it into a vector.
     c. Add the identified location information to our list of results
     
   
 ## Required Components
+On the "[Seek]" page, under the hob search heading you can search for a particular job and where it is placed:
 
-### CNBC website
-We are using Chrome Developer tools to get the XPath of the countries in demand section in the website to get raw data to plot the jobs in demand against. This data will aid us in plotting our graphs and to find trends within countries (y-axis: jobs in demand, x-axis: list of countries). 
+![Identify the job titles based on the headings](images/seek.png)
+
+As we scroll down, we are able to identify different headings and sub headings and a search button, like below:
+
+![Choose the headings that we are wanting to get information / scrape 1](images/truckdriver.png)
+
+In the next section, we are going to scrape the information below on the seek page after we have clicked the seek button. To do so, we must know how the page structures its documents and what hints can we extract from it to make it easier to identify the pages that we need. Also, we want to extract the number of jobs found  section, so we also have to find the correct CSS selectors. It is very important to use the top left hand corner highlighted showing the number of jobs found so we know how many the country has or lacks of that specific job category and skills related to that. The reason also why they may not take it which may be due to salary which the next website we scrape will compare.
 
 
-1. Visit the [CNBC] website and go to a blog article "[The 9 most-in-demand jobs of 2017]". 
-2. Underneath the main title, within sub-headings, we would see a list of jobs in-demand, their current salary and the projected hiring growth of that job by 2024:
-    a. Identify the 9 jobs in demand (e.g. Registered Nurse, Data Scientist) and projected hiring growth by 2024.
-    b. Populate it into a table.
-    c. Add the identified location information to our list of results
-3. Identify the XPath and CSS selectors for the job titles based on their ranks, salaries, and the projected hiring growth of that job by 2024.
+![Choose the headings that we are wanting to get information / scrape 2 NEED TO CHANGE IMAGE](images/practicenurse.png)
 
+
+
+
+
+
+
+
+
+
+As we try to find the CSS selector for the number of jobs found for the particular jobs searched, we have to figure out how to exclude the paragraphs in CSS sections so that we scrape for number of jobs element under each job heading which is related to the next webpage we will scrape which is the 9 most in demand jobs, it would not get all of the irrelevant paragraphs (p) selectors.
+
+![The parts of the seek page that we need to scrape (compact interface shown)](images/truckdriver1.png)
+
+
+
+![The parts of the seek page that we need to scrape (compact interface shown)](images/practicenurse1.png)
+
+We want to take the job heading and the location it is at the other details are not necessary just the job title and where in the country it is located so can be used to make our graphs. 
+
+
+We are using Chrome Developer tools to get the XPath of the number of jobs available for the specific job searched in the seek section in the website. We do this to get the raw data to plot the number of jobs in each category to what that jobs salary provides and the location of the job in the country (e.g south island or north island). This data will aid us in plotting our graphs and to find trends within jobs (y-axis: jobs category and the number available, x-axis: salary of each of the 9 job categories (we get this data fromt he next website we extract)). 
+
+![The parts of the seek page that we need to scrape](images/xpath1.png)
+
+So the XPath identified is this one: 
+`//*[@id="app"]/div/div/div[1]/div/div[2]/span/div/section/div/div/div[2]/div/div[2]/div/div[1]/article[5]`
+
+For other job titles, this require us to follow the same procedure, just with different links for the search results. 
+
+
+ On the "[The 9 Most In-Demand Jobs of 2017]" article, the page contains a list of jobs:
+
+![Identify the job titles based on the headings](images/9mostindemandjobs.png)   
     
-//second website screenshot HERE
+We know that the required URL to get the components from is [CNBC] article, and as we scroll down, we are able to identify the job titles headings and sub headings. In this section, we are going to scrape the job titles and salary title to compare with the seek website. To do so, we must know how the page structures its documents and what hints can we extract from it to make it easier to identify the pages that we need. Also, we want to extract the 'Salary' section and the "Job title section" with its given rank, so we also have to find the correct CSS selectors like below:
 
-### Seek website
-Then, to investigate the claim made by the [CNBC] article,  
-- identify the XPath for the job title from the search result page
-`//*[@id="app"]/div/div/div[1]/div/div[2]/span/div/section/div/div/div[2]/div[2]/div[2]/div/div[1]/article[3]`
-
-XPath identified: `//*[@id="app"]/div/div/div[1]/div/div[2]/span/div/section/div/div/div[2]/div/div[2]/div/div[1]/article[3]`
+![Choose the headings that we are wanting to get information / scrape)](images/9mostindemandhighlighted.png)    
 
 
-`#app > div > div > div:nth-child(3) > div > div._1qkS_Nq._1XnlU0N > span > div > section > div > div > div._3stY0dI > div._3mWBIbx._1NlRMHD > div:nth-child(2) > div > div._365Hwu1._14yeqbb > article:nth-child(3)`
+ code image for 2nd website (with the code) change description below
+ 
+As we try to find the CSS selector for the '9 most in demand careers' section, we have to figure out how to exclude the paragraphs in CSS sections so that we scrape for projected growth, it would not get all of the irrelevant paragraphs (p) selectors.
+
+
+![CSS selector for the job title](images/css1.png)
+
+This is the CSS selector identified for the job title: 
+`#article_body > div:nth-child(2) > div.group > p:nth-child(1) > strong:nth-child(2)`
+
+
+![CSS selector for the salary](images/css1.png)
+This is the CSS selector identified for the salary:
+
+![CSS selector for the job title](images/css2.png)
+
+This is the CSS selector identified for the Projected hiring growth:
+
+`#article_body > div:nth-child(2) > div.group > p:nth-child(3)`
+
+
+We want to take the 9 careers which are mentioned and the salary of each job which is an estomate of how much each individual earns doing those top 9 most in demand careers. This will show us if there is a relatonship between salary and most in demand careers such as they are in demand as they are a low pay or there is a lack of skills and knowledge around that area in our country. The data is only reliable to New Zealand as we are using a NZ job site therefore is limited to one country which means will be more reliable but can not be assumed for multiple countries and populations.
+
 
 # Scraping Procedure
 We start with defining a few key components (the required libraries, starting url, and key XPath/CSS selectors):
@@ -157,8 +214,6 @@ df
 
 ```
 
-
-### Seek website
 
 ```{r search results for truck driver jobs, echo=TRUE}
 url <-
@@ -330,14 +385,11 @@ title.salary.selector <- "#app > div > div > div:nth-child(3) > div > div._1qkS_
 # Analysis
 Our `job.locations` vector is now complete, and should contain an entry for every job advertised. Now, we can create a tally of these locations and plot them using a suitable method (e.g., a bar plot):
 ```{r summary, echo=TRUE, fig.align="center", out.width="100%"}
+
 # tally <- table(job.locations)
 # barplot(tally, main="Location of Data Science Jobs on Seek", ylab="# Jobs Found", col="#00508f")
+
 ```
-
-The analysis done here suggests that the majority of data science jobs are in the North Island and centred around either Auckland or Wellington.
-
-## Assumptions
-The analysis here is rather simple - we have only really considered a single search for jobs on a single web site. To be more rigorous, we should examine multiple web sites, and maybe attempt to consider other terms often confused with or related to "data science" (e.g., "predictive analytics", "data mining", "machine learning").
 
 [CNBC]: https://www.cnbc.com/2017/03/27/the-9-most-in-demand-jobs-of-2017.html
 [Seek]: https://seek.co.nz
