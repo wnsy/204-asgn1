@@ -18,7 +18,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Problem Definition
 
-Finding the top 9 most in-demand careers of 2017 and the salary that you receive from working under one of those job category. We will then compare it to see when typed into Seek to search for jobs in New Zealand of those 9 categories how many jobs of them are available in our country and in what city/area. This is for us to compare if the careers are more in demand because it is a low pay job or if it because the country lacks that set of skills and knowledge level or it could just be a mixture of both. Also for the next generation to take into account in deciding careers and what job paths they want to take. So they can understand what jobs are in demand and what is the strong growing field also to know what lacks skills and to work towards gaining more skills and experience for jobs rather than sticking to low pay jobs however that can be a starting point for them when entering into the industry and earning in their initial years and from their can move up and into higher positions.
+Finding the top 9 most in-demand careers of 2017 and from that rank of 9 to 1 to see when searched for these jobs on the seek nz job website how many are actually available if there are any. We wabt to see how many of these jobs which are most in demand in the world for 2017 are in demand in New Zealand and to see if there is a trend and to use the projected hiring growth factor to see if these jobs will increase demand by 2024 and therefore if it is a good career for people to pursue and go work in. This is for us to compare if the careers are more in demand because it is a low pay job or requires more manual work or if it because the country lacks that set of skills and knowledge level. Also for the next generation and the present people to take into account in deciding careers and what job paths they want to take. So they can understand what jobs are in demand and what is the strong growing field. They will also know which jobs are high required therefore can gain the correct skills for those jobs and earn more experience and exposure to the work field and environment. 
 
 To answer this question, we could follow this manual process:
 
@@ -48,24 +48,10 @@ As we scroll down, we are able to identify different headings and sub headings a
 In the next section, we are going to scrape the information below on the seek page after we have clicked the seek button. To do so, we must know how the page structures its documents and what hints can we extract from it to make it easier to identify the pages that we need. Also, we want to extract the number of jobs found  section, so we also have to find the correct CSS selectors. It is very important to use the top left hand corner highlighted showing the number of jobs found so we know how many the country has or lacks of that specific job category and skills related to that. The reason also why they may not take it which may be due to salary which the next website we scrape will compare.
 
 
-![Choose the headings that we are wanting to get information / scrape 2 NEED TO CHANGE IMAGE](images/practicenurse.png)
-
-
-
-
-
-
-
-
-
+![Choose the headings that we are wanting to get information / scrape](images/truckdriverhighlighted.png)
+![The parts of the seek page that we need to scrape (compact interface shown)](images/nursehighlighted.png)
 
 As we try to find the CSS selector for the number of jobs found for the particular jobs searched, we have to figure out how to exclude the paragraphs in CSS sections so that we scrape for number of jobs element under each job heading which is related to the next webpage we will scrape which is the 9 most in demand jobs, it would not get all of the irrelevant paragraphs (p) selectors.
-
-![The parts of the seek page that we need to scrape (compact interface shown)](images/truckdriver1.png)
-
-
-
-![The parts of the seek page that we need to scrape (compact interface shown)](images/practicenurse1.png)
 
 We want to take the job heading and the location it is at the other details are not necessary just the job title and where in the country it is located so can be used to make our graphs. 
 
@@ -118,7 +104,7 @@ We start with defining a few key components (the required libraries, starting ur
 
 ```{r get job titles, echo=TRUE}
 library(rvest)
-library(ggplot2)
+#library(ggplot2)
 
 ##CREDIT for initial code: Grant Dick (Lecturer)
 
