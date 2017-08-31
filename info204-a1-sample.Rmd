@@ -181,6 +181,20 @@ hiring.growths
 
 ```
 
+Next, we are going to get just the ranks of the job titles, excluding the job titles itself. 
+```{r attempt to get ranks, echo=TRUE}
+get.ranks <- job.details[,1]
+get.ranks <- as.numeric(get.ranks)
+get.ranks
+```
+
+```{r make into a vector first, echo=TRUE}
+vec <- table(hiring.growths, get.ranks)
+vec
+barplot(vec)
+```
+
+
 ```{r cnbc matrix, echo=TRUE}
 cnbc<- matrix(cbind(job.details,salaries,hiring.growths), nrow = 9, ncol = 4)
 cnbc
